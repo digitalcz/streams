@@ -6,7 +6,6 @@
 [![License](http://poser.pugx.org/digitalcz/streams/license)](https://packagist.org/packages/digitalcz/streams) 
 [![PHP Version Require](http://poser.pugx.org/digitalcz/streams/require/php)](https://packagist.org/packages/digitalcz/streams)
 [![CI](https://github.com/digitalcz/streams/workflows/CI/badge.svg)](https://github.com/digitalcz/streams/actions)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/digitalcz/streams/badges/quality-score.png?b=0.x)](https://scrutinizer-ci.com/g/digitalcz/streams/?branch=0.x)
 [![codecov](https://codecov.io/gh/digitalcz/streams/branch/0.x/graph/badge.svg?token=QzZ5iMNkg3)](https://codecov.io/gh/digitalcz/streams)
 
 Opinionated abstraction around PHP streams loosely implementing PSR-7 StreamInterface
