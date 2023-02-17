@@ -19,10 +19,6 @@ Via [Composer](https://getcomposer.org/)
 $ composer require digitalcz/streams
 ```
 
-## Usage
-
-See [examples](examples) for more
-
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
