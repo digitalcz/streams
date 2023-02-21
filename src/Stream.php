@@ -142,7 +142,7 @@ final class Stream implements StreamInterface
 
         $stats = fstat($this->resource);
 
-        if (is_array($stats) && isset($stats['size'])) { // @phpstan-ignore-line
+        if (is_array($stats) && isset($stats['size'])) {
             $this->size = $stats['size'];
 
             return $this->size;

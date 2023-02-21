@@ -52,7 +52,7 @@ class StreamTest extends StreamIntegrationTest
         $handle = $this->createTempResource('r');
         $stream = new Stream($handle);
         unset($stream);
-        self::assertIsResource($handle); // @phpstan-ignore-line
+        self::assertIsResource($handle);
     }
 
     public function testConvertsToString(): void
