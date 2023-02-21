@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace DigitalCz\Streams;
 
+use Http\Psr7Test\StreamIntegrationTest;
+use InvalidArgumentException;
 use LogicException;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\TestCase;
 use Throwable;
 
-class StreamTest extends TestCase
+class StreamTest extends StreamIntegrationTest
 {
     public function testConstructorThrowsExceptionOnInvalidArgument(): void
     {
-        $this->expectException(StreamException::class);
+        $this->expectException(InvalidArgumentException::class);
         new Stream(true); // @phpstan-ignore-line
     }
 
@@ -89,6 +88,7 @@ class StreamTest extends TestCase
         $handle = $this->createTempResource('w+');
         fwrite($handle, 'data');
         $stream = new Stream($handle);
+        $stream->rewind();
         self::assertSame('data', $stream->getContents());
         $stream->close();
     }
@@ -193,8 +193,10 @@ class StreamTest extends TestCase
         $stream->close();
     }
 
-    #[RequiresPhpExtension('zlib')]
-    #[DataProvider('gzipModeProvider')]
+    /**
+     * @requires extension zlib
+     * @dataProvider gzipModeProvider
+     */
     public function testGzipStreamModes(string $mode, bool $readable, bool $writable): void
     {
         $r = gzopen('php://temp', $mode);
@@ -217,7 +219,9 @@ class StreamTest extends TestCase
         ];
     }
 
-    #[DataProvider('readableModeProvider')]
+    /**
+     * @dataProvider readableModeProvider
+     */
     public function testReadableStream(string $mode): void
     {
         $r = $this->createTempResource($mode);
@@ -264,7 +268,9 @@ class StreamTest extends TestCase
         $stream->close();
     }
 
-    #[DataProvider('writableModeProvider')]
+    /**
+     * @dataProvider writableModeProvider
+     */
     public function testWritableStream(string $mode): void
     {
         $r = $this->createTempResource($mode);
@@ -312,48 +318,10 @@ class StreamTest extends TestCase
         $stream->close();
     }
 
-    public function testCopySourceNotReadable(): void
+    /** @inheritDoc */
+    public function createStream($data)
     {
-        $target = new Stream($this->createTempResource('wb+'));
-        $source = new Stream(fopen('php://output', 'wb')); // @phpstan-ignore-line
-
-        $this->expectException(StreamException::class);
-        $this->expectExceptionMessage('Source stream is not readable');
-        $target->copy($source);
-    }
-
-    public function testCopyTargetNotWritable(): void
-    {
-        $target = new Stream($this->createTempResource('rb'));
-        $source = new Stream($this->createTempResource('wb+'));
-
-        $this->expectException(StreamException::class);
-        $this->expectExceptionMessage('Target stream is not writable');
-        $target->copy($source);
-    }
-
-    public function testCopy(): void
-    {
-        $target = new Stream($this->createTempResource('wb+'));
-        $source = new Stream($this->createTempResource('wb+'));
-
-        $source->write('test');
-        $target->copy($source);
-        $target->rewind();
-        self::assertEquals('test', $target->getContents());
-    }
-
-    public function testCopyPurgeSize(): void
-    {
-        $target = new Stream($this->createTempResource('wb+'));
-        $source = new Stream($this->createTempResource('wb+'));
-
-        $source->write('test');
-        $sizeBefore = $target->getSize();
-        $target->copy($source);
-        $target->rewind();
-
-        self::assertNotEquals($sizeBefore, $target->getSize());
+        return StreamUtils::create($data);
     }
 
     private function assertStreamStateAfterClosedOrDetached(Stream $stream): void

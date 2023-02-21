@@ -15,14 +15,4 @@ class TempFileTest extends TestCase
         $file->delete();
         self::assertFileDoesNotExist($file->getPath());
     }
-
-    public function testFromStream(): void
-    {
-        $stream = new TempStream();
-        $stream->write('pokus');
-        $file = TempFile::fromStream($stream);
-
-        self::assertEquals(0, $file->tell());
-        self::assertEquals('pokus', $file->getContents());
-    }
 }

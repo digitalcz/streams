@@ -29,11 +29,6 @@ interface StreamInterface extends PsrStreamInterface
      */
     public function seek($offset, $whence = SEEK_SET): void;
 
-    /**
-     * @return resource
-     */
-    public function getHandle();
-
     public function getContents(): string;
 
     public function getSize(): ?int;
@@ -57,6 +52,4 @@ interface StreamInterface extends PsrStreamInterface
      * @param string $string
      */
     public function write($string): int;
-
-    public function copy(Stream $source): int;
 }

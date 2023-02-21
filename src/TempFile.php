@@ -11,8 +11,11 @@ namespace DigitalCz\Streams;
  *
  * When the underlying stream handle closes, this file will be deleted
  */
-class TempFile extends Stream implements FileInterface
+final class TempFile implements FileInterface
 {
+    use StreamDecoratorTrait;
+
+    protected StreamInterface $stream;
     private string $path;
 
     public function __construct()
@@ -23,24 +26,15 @@ class TempFile extends Stream implements FileInterface
             throw new StreamException('Unable to create tmpfile');
         }
 
-        parent::__construct($resource);
-
-        $path = $this->getMetadata('uri');
+        $stream = new Stream($resource, 0);
+        $path = $stream->getMetadata('uri');
 
         if (!is_string($path)) {
             throw new StreamException('Unable to create TempFile');
         }
 
         $this->path = $path;
-    }
-
-    public static function fromStream(StreamInterface $stream): self
-    {
-        $self = new self();
-        $self->copy($stream);
-        $self->rewind();
-
-        return $self;
+        $this->stream = $stream;
     }
 
     public function getPath(): string

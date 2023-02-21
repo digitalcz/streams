@@ -8,7 +8,10 @@
 [![CI](https://github.com/digitalcz/streams/workflows/CI/badge.svg)](https://github.com/digitalcz/streams/actions)
 [![codecov](https://codecov.io/gh/digitalcz/streams/branch/0.x/graph/badge.svg?token=QzZ5iMNkg3)](https://codecov.io/gh/digitalcz/streams)
 
-Opinionated abstraction around PHP streams loosely implementing PSR-7 StreamInterface
+Opinionated abstraction around PHP streams implementing PSR-7 StreamInterface.
+It aims to improve working with files or remote streams in unified way.
+
+Heavily inspired by guzzle/psr7.
 
 ## Install
 

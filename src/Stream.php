@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace DigitalCz\Streams;
 
-class Stream implements StreamInterface
+use InvalidArgumentException;
+
+final class Stream implements StreamInterface
 {
     /**
      * @see http://php.net/manual/function.fopen.php
@@ -14,7 +16,7 @@ class Stream implements StreamInterface
     private const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
 
     /** @var resource|null */
-    private $handle;
+    private $resource;
 
     private ?int $size;
 
@@ -25,20 +27,31 @@ class Stream implements StreamInterface
     private bool $writable;
 
     /**
-     * @param resource $stream
+     * @param resource $resource
      */
-    public function __construct($stream, ?int $size = null)
+    public function __construct($resource, ?int $size = null)
     {
-        if (!is_resource($stream)) {
-            throw new StreamException('Not a resource');
+        if (!is_resource($resource)) {
+            throw new InvalidArgumentException('Not a resource');
         }
 
         $this->size = $size;
-        $this->handle = $stream;
-        $meta = stream_get_meta_data($this->handle);
+        $this->resource = $resource;
+        $meta = stream_get_meta_data($this->resource);
         $this->seekable = $meta['seekable'] ?? false; // @phpstan-ignore-line
         $this->readable = (bool)preg_match(self::READABLE_MODES, $meta['mode']);
         $this->writable = (bool)preg_match(self::WRITABLE_MODES, $meta['mode']);
+    }
+
+    public static function temp(string $mode): self
+    {
+        $handle = fopen('php://temp', $mode);
+
+        if (!is_resource($handle)) {
+            throw new StreamException('Unable to create TempStream');
+        }
+
+        return new self($handle, 0);
     }
 
     /**
@@ -47,20 +60,20 @@ class Stream implements StreamInterface
      */
     public function getMetadata($key = null)
     {
-        if (!isset($this->handle)) {
+        if (!isset($this->resource)) {
             return $key !== null ? null : [];
         }
 
-        $meta = stream_get_meta_data($this->handle);
+        $meta = stream_get_meta_data($this->resource);
 
         return $key !== null ? ($meta[$key] ?? null) : $meta;
     }
 
     public function close(): void
     {
-        if (isset($this->handle)) {
-            if (is_resource($this->handle)) {
-                fclose($this->handle);
+        if (isset($this->resource)) {
+            if (is_resource($this->resource)) {
+                fclose($this->resource);
             }
 
             $this->detach();
@@ -72,12 +85,12 @@ class Stream implements StreamInterface
      */
     public function detach()
     {
-        if (!isset($this->handle)) {
+        if (!isset($this->resource)) {
             return null;
         }
 
-        $result = $this->handle;
-        unset($this->handle);
+        $result = $this->resource;
+        unset($this->resource);
         $this->size = null;
         $this->readable = $this->writable = $this->seekable = false;
 
@@ -106,24 +119,8 @@ class Stream implements StreamInterface
         }
     }
 
-    /**
-     * @return resource
-     */
-    public function getHandle()
-    {
-        if (!isset($this->handle)) {
-            throw new StreamException('Stream is detached');
-        }
-
-        return $this->handle;
-    }
-
     public function getContents(): string
     {
-        if ($this->isSeekable()) {
-            $this->rewind();
-        }
-
         $contents = stream_get_contents($this->getHandle());
 
         if (!is_string($contents)) {
@@ -139,11 +136,11 @@ class Stream implements StreamInterface
             return $this->size;
         }
 
-        if (!isset($this->handle)) {
+        if (!isset($this->resource)) {
             return null;
         }
 
-        $stats = fstat($this->handle);
+        $stats = fstat($this->resource);
 
         if (is_array($stats) && isset($stats['size'])) { // @phpstan-ignore-line
             $this->size = $stats['size'];
@@ -235,38 +232,6 @@ class Stream implements StreamInterface
         return $result;
     }
 
-    public function copy(StreamInterface $source): int
-    {
-        if (!$source->isReadable()) {
-            throw new StreamException('Source stream is not readable');
-        }
-
-        if (!$this->isWritable()) {
-            throw new StreamException('Target stream is not writable');
-        }
-
-        $seekable = $source->isSeekable();
-
-        if ($seekable) {
-            $sourcePos = $source->tell();
-            $source->rewind(); // rewind source to beginning
-        }
-
-        // We can't know the size after writing anything
-        $this->size = null;
-        $bytes = stream_copy_to_stream($source->getHandle(), $this->getHandle());
-
-        if ($seekable) {
-            $source->seek($sourcePos); // forward source to previous position
-        }
-
-        if (!is_int($bytes)) {
-            throw new StreamException('Failed to copy stream');
-        }
-
-        return $bytes;
-    }
-
     /**
      * Closes the stream when the destructed
      */
@@ -277,6 +242,22 @@ class Stream implements StreamInterface
 
     public function __toString(): string
     {
+        if ($this->isSeekable()) {
+            $this->rewind();
+        }
+
         return $this->getContents();
+    }
+
+    /**
+     * @return resource
+     */
+    private function getHandle()
+    {
+        if (!isset($this->resource)) {
+            throw new StreamException('Stream is detached');
+        }
+
+        return $this->resource;
     }
 }

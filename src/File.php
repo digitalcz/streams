@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace DigitalCz\Streams;
 
-class File extends Stream implements FileInterface
+final class File implements FileInterface
 {
+    use StreamDecoratorTrait;
+
+    protected StreamInterface $stream;
     private string $path;
 
     public function __construct(string $path, string $mode = 'rb+')
     {
-        $stream = @fopen($path, $mode);
+        $resource = @fopen($path, $mode);
 
-        if (!is_resource($stream)) {
+        if (!is_resource($resource)) {
             throw new StreamException('Failed to open file' . $path);
         }
 
@@ -23,8 +26,7 @@ class File extends Stream implements FileInterface
         }
 
         $this->path = $path;
-
-        parent::__construct($stream, $size);
+        $this->stream = new Stream($resource, $size);
     }
 
     public static function temp(): self
