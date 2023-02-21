@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DigitalCz\Streams;
 
+use InvalidArgumentException;
+use Psr\Http\Message\StreamInterface as PsrStreamInterface;
+
 /**
  * This class leverages behavior of php function tmpfile()
  *
@@ -35,6 +38,38 @@ final class TempFile implements FileInterface
 
         $this->path = $path;
         $this->stream = $stream;
+    }
+
+    /**
+     * @param PsrStreamInterface|resource|string $from
+     */
+    public static function from(mixed $from): self
+    {
+        if ($from instanceof PsrStreamInterface) {
+            $file = new self();
+            $file->copy($from);
+            $file->rewind();
+
+            return $file;
+        }
+
+        if (is_string($from)) {
+            $file = new self();
+            $file->write($from);
+            $file->rewind();
+
+            return $file;
+        }
+
+        if (is_resource($from)) {
+            $file = new self();
+            $file->copy(new Stream($from));
+            $file->rewind();
+
+            return $file;
+        }
+
+        throw new InvalidArgumentException('Cannot create TempFile from ' . get_debug_type($from));
     }
 
     public function getPath(): string

@@ -318,10 +318,54 @@ class StreamTest extends StreamIntegrationTest
         $stream->close();
     }
 
+    public function testCopySourceNotReadable(): void
+    {
+        $target = Stream::temp('rb+');
+        $source = new Stream(fopen('php://output', 'wb')); // @phpstan-ignore-line
+
+        $this->expectException(StreamException::class);
+        $this->expectExceptionMessage('Source stream is not readable');
+        $target->copy($source);
+    }
+
+    public function testCopyTargetNotWritable(): void
+    {
+        $target = Stream::temp('rb');
+        $source = Stream::temp('rb+');
+
+        $this->expectException(StreamException::class);
+        $this->expectExceptionMessage('Target stream is not writable');
+        $target->copy($source);
+    }
+
+    public function testCopy(): void
+    {
+        $target = Stream::temp('rb+');
+        $source = Stream::temp('rb+');
+
+        $source->write('test');
+        $target->copy($source);
+        $target->rewind();
+        self::assertEquals('test', $target->getContents());
+    }
+
+    public function testCopyPurgeSize(): void
+    {
+        $target = Stream::temp('rb+');
+        $source = Stream::temp('rb+');
+
+        $source->write('test');
+        $sizeBefore = $target->getSize();
+        $target->copy($source);
+        $target->rewind();
+
+        self::assertNotEquals($sizeBefore, $target->getSize());
+    }
+
     /** @inheritDoc */
     public function createStream($data)
     {
-        return StreamUtils::create($data);
+        return Stream::from($data);
     }
 
     private function assertStreamStateAfterClosedOrDetached(Stream $stream): void

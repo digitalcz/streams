@@ -52,4 +52,6 @@ interface StreamInterface extends PsrStreamInterface
      * @param string $string
      */
     public function write($string): int;
+
+    public function copy(PsrStreamInterface $source): int;
 }

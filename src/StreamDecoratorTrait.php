@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DigitalCz\Streams;
 
+use Psr\Http\Message\StreamInterface as PsrStreamInterface;
+
 trait StreamDecoratorTrait
 {
     public function __construct(StreamInterface $stream)
@@ -84,6 +86,11 @@ trait StreamDecoratorTrait
     public function write($string): int
     {
         return $this->stream->write($string);
+    }
+
+    public function copy(PsrStreamInterface $source): int
+    {
+        return $this->stream->copy($source);
     }
 
     public function __toString(): string
