@@ -10,7 +10,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Use Decorator pattern for FileInterface implementations
 
 ### Added
-- Added integration test for PSR-7 StreamInterface
+- Add integration test for PSR-7 StreamInterface
+- Add StreamWrapper
+- Add CachingStream
 
 ## [0.1.0]
 First release 🚀
