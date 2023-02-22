@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [0.2.1] 2022-02-22
+### Fixed
+- Fixed StreamWrapper invalid schema
+
 ## [0.2.0] 2022-02-22
 ### Changed
 - Refactor Stream to implement PSR-7 StreamInterface

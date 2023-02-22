@@ -9,6 +9,9 @@ use InvalidArgumentException;
 use LogicException;
 use Throwable;
 
+/**
+ * @covers \DigitalCz\Streams\Stream
+ */
 class StreamTest extends StreamIntegrationTest
 {
     public function testConstructorThrowsExceptionOnInvalidArgument(): void

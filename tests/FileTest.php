@@ -6,6 +6,9 @@ namespace DigitalCz\Streams;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \DigitalCz\Streams\File
+ */
 class FileTest extends TestCase
 {
     public function testOpenNonExistentFile(): void

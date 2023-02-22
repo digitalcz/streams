@@ -12,7 +12,7 @@ use InvalidArgumentException;
 final class StreamWrapper
 {
     /** @var resource */
-    public $resource;
+    public $context;
     private StreamInterface $stream;
     private string $mode;
 
@@ -35,7 +35,7 @@ final class StreamWrapper
             throw new InvalidArgumentException('The stream must be readable, writable, or both.');
         }
 
-        $resource = fopen('digitalcz_streams://stream', $mode, false, self::createStreamContext($stream));
+        $resource = fopen('digitalcz-streams://stream', $mode, false, self::createStreamContext($stream));
 
         if (!is_resource($resource)) {
             throw new StreamException('Unable to create StreamWrapper');
@@ -52,7 +52,7 @@ final class StreamWrapper
     public static function createStreamContext(StreamInterface $stream)
     {
         return stream_context_create([
-            'digitalcz_streams' => ['stream' => $stream],
+            'digitalcz-streams' => ['stream' => $stream],
         ]);
     }
 
@@ -61,22 +61,22 @@ final class StreamWrapper
      */
     public static function register(): void
     {
-        if (!in_array('digitalcz_streams', stream_get_wrappers(), true)) {
-            stream_wrapper_register('digitalcz_streams', self::class);
+        if (!in_array('digitalcz-streams', stream_get_wrappers(), true)) {
+            stream_wrapper_register('digitalcz-streams', self::class);
         }
     }
 
     // phpcs:ignore
     public function stream_open(string $path, string $mode, int $options, ?string &$opened_path = null): bool
     {
-        $options = stream_context_get_options($this->resource);
+        $options = stream_context_get_options($this->context);
 
-        if (!isset($options['digitalcz_streams']['stream'])) {
+        if (!isset($options['digitalcz-streams']['stream'])) {
             return false;
         }
 
         $this->mode = $mode;
-        $this->stream = $options['digitalcz_streams']['stream'];
+        $this->stream = $options['digitalcz-streams']['stream'];
 
         return true;
     }

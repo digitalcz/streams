@@ -6,6 +6,9 @@ namespace DigitalCz\Streams;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \DigitalCz\Streams\TempFile
+ */
 class TempFileTest extends TestCase
 {
     public function testCreateAndDelete(): void

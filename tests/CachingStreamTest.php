@@ -6,6 +6,9 @@ namespace DigitalCz\Streams;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \DigitalCz\Streams\CachingStream
+ */
 class CachingStreamTest extends TestCase
 {
     public function testUseOriginalIfAvailable(): void
