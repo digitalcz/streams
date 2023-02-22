@@ -4,7 +4,7 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [0.2.0]
+## [0.2.0] 2022-02-22
 ### Changed
 - Refactor Stream to implement PSR-7 StreamInterface
 - Use Decorator pattern for FileInterface implementations
@@ -14,5 +14,5 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Add StreamWrapper
 - Add CachingStream
 
-## [0.1.0]
+## [0.1.0] 2022-02-17
 First release 🚀
