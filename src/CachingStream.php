@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DigitalCz\Streams;
+
+use InvalidArgumentException;
 
 final class CachingStream implements StreamInterface
 {
@@ -27,13 +31,14 @@ final class CachingStream implements StreamInterface
         return max($this->stream->getSize(), $originalSize);
     }
 
+    /** @inheritDoc */
     public function seek($offset, $whence = SEEK_SET): void
     {
         $offset = match ($whence) {
             SEEK_SET => $offset,
             SEEK_CUR => $offset + $this->tell(),
             SEEK_END => $offset + ($this->original->getSize() ?? $this->stream->copy($this->original)),
-            default => throw new \InvalidArgumentException('Invalid whence'),
+            default => throw new InvalidArgumentException('Invalid whence'),
         };
 
         $diff = $offset - ($this->stream->getSize() ?? 0);
@@ -48,6 +53,7 @@ final class CachingStream implements StreamInterface
         }
     }
 
+    /** @inheritDoc */
     public function read($length): string
     {
         $data = $this->stream->read($length);
@@ -68,9 +74,11 @@ final class CachingStream implements StreamInterface
         return $data;
     }
 
+    /** @inheritDoc */
     public function write($string): int
     {
-        $overflow = (strlen($string) + $this->tell()) - $this->original->tell();
+        $overflow = strlen($string) + $this->tell() - $this->original->tell();
+
         if ($overflow > 0) {
             $this->skipBytes += $overflow;
         }

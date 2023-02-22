@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DigitalCz\Streams;
 
 use PHPUnit\Framework\TestCase;
-
-use function PHPUnit\Framework\assertSame;
 
 class CachingStreamTest extends TestCase
 {
