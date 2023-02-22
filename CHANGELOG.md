@@ -14,5 +14,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Add StreamWrapper
 - Add CachingStream
 
+### Removed
+- Remove TempStream::fromStream() in favor of TempStream::from()
+- Remove Stream::getHandle() in favor of StreamWrapper::from($stream)
+
 ## [0.1.0] 2022-02-17
 First release 🚀
