@@ -4,6 +4,13 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [0.3.0] 2022-02-27
+### Added
+- Add BufferedStream that buffers stream data, to make it seekable
+
+### Removed
+- Remove CachingStream in favor of BufferedStream
+
 ## [0.2.1] 2022-02-22
 ### Fixed
 - Fixed StreamWrapper invalid schema
