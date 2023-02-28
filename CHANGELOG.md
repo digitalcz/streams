@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [Unreleased]
+### Added
+- Add more tests
+
 ## [0.3.0] 2022-02-27
 ### Added
 - Add BufferedStream that buffers stream data, to make it seekable

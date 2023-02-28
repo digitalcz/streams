@@ -33,7 +33,7 @@ final class TempFile implements FileInterface
         $path = $stream->getMetadata('uri');
 
         if (!is_string($path)) {
-            throw new StreamException('Unable to create TempFile');
+            throw new StreamException(sprintf('Unable to create %s', self::class));
         }
 
         $this->path = $path;
@@ -69,7 +69,7 @@ final class TempFile implements FileInterface
             return $file;
         }
 
-        throw new InvalidArgumentException('Cannot create TempFile from ' . get_debug_type($from));
+        throw new InvalidArgumentException(sprintf('Cannot create %s from %s.', self::class, get_debug_type($from)));
     }
 
     public function getPath(): string
