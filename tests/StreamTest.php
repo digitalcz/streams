@@ -50,6 +50,30 @@ class StreamTest extends StreamIntegrationTest
         $stream->close();
     }
 
+    public function testFromStream(): void
+    {
+        $stream = Stream::from('test');
+        $stream = Stream::from($stream);
+        self::assertSame('test', $stream->getContents());
+    }
+
+    public function testFromString(): void
+    {
+        $stream = Stream::from('test');
+        self::assertSame('test', $stream->getContents());
+    }
+
+    public function testFromResource(): void
+    {
+        $resource = fopen('php://temp', 'wb+');
+        self::assertNotFalse($resource);
+        fwrite($resource, 'test');
+        fseek($resource, 0);
+
+        $stream = TempFile::from($resource);
+        self::assertSame('test', $stream->getContents());
+    }
+
     public function testStreamDoesNotCloseAutomaticallyAfterDestroy(): void
     {
         $handle = $this->createTempResource('r');

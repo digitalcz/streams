@@ -8,6 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Add more tests
 - Add StreamDecoratorTrait test
+- Improve test coverage
 
 ## [0.3.0] 2022-02-27
 ### Added
