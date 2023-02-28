@@ -7,6 +7,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [Unreleased]
 ### Added
 - Add more tests
+- Add StreamDecoratorTrait test
 
 ## [0.3.0] 2022-02-27
 ### Added

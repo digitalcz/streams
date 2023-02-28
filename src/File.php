@@ -8,7 +8,6 @@ final class File implements FileInterface
 {
     use StreamDecoratorTrait;
 
-    protected StreamInterface $stream;
     private string $path;
 
     public function __construct(string $path, string $mode = 'rb+')

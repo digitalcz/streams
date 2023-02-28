@@ -8,6 +8,8 @@ use Psr\Http\Message\StreamInterface as PsrStreamInterface;
 
 trait StreamDecoratorTrait
 {
+    protected StreamInterface $stream;
+
     public function __construct(StreamInterface $stream)
     {
         $this->stream = $stream;
