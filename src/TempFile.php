@@ -18,7 +18,6 @@ final class TempFile implements FileInterface
 {
     use StreamDecoratorTrait;
 
-    protected StreamInterface $stream;
     private string $path;
 
     public function __construct()
