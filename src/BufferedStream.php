@@ -22,7 +22,7 @@ final class BufferedStream implements StreamInterface
     public function __construct(StreamInterface $source)
     {
         $this->source = $source;
-        $this->buffer = Stream::temp('rw+');
+        $this->buffer = Stream::temp('w+b');
     }
 
     public function getSize(): ?int
