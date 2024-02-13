@@ -26,7 +26,7 @@ trait StreamDecoratorTrait
     }
 
     /** @inheritDoc */
-    public function getMetadata($key = null)
+    public function getMetadata(?string $key = null)
     {
         return $this->stream->getMetadata($key);
     }
@@ -72,20 +72,17 @@ trait StreamDecoratorTrait
         $this->stream->rewind();
     }
 
-    /** @inheritDoc */
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         $this->stream->seek($offset, $whence);
     }
 
-    /** @inheritDoc */
-    public function read($length): string
+    public function read(int $length): string
     {
         return $this->stream->read($length);
     }
 
-    /** @inheritDoc */
-    public function write($string): int
+    public function write(string $string): int
     {
         return $this->stream->write($string);
     }

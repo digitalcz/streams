@@ -34,8 +34,7 @@ final class BufferedStream implements StreamInterface
         return $this->source->getSize();
     }
 
-    /** @inheritDoc */
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         $offset = match ($whence) {
             SEEK_SET => $offset,
@@ -53,8 +52,7 @@ final class BufferedStream implements StreamInterface
         }
     }
 
-    /** @inheritDoc */
-    public function read($length): string
+    public function read(int $length): string
     {
         $data = '';
 
@@ -73,8 +71,7 @@ final class BufferedStream implements StreamInterface
         return $data;
     }
 
-    /** @inheritDoc */
-    public function write($string): int
+    public function write(string $string): int
     {
         throw new StreamException('This stream is not writable');
     }
@@ -120,7 +117,7 @@ final class BufferedStream implements StreamInterface
     }
 
     /** @inheritDoc */
-    public function getMetadata($key = null)
+    public function getMetadata(?string $key = null)
     {
         return $this->buffer->getMetadata($key);
     }
