@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DigitalCz\Streams;
 
+use InvalidArgumentException;
+use Psr\Http\Message\StreamInterface as PsrStreamInterface;
+
 final class File implements FileInterface
 {
     use StreamDecoratorTrait;
@@ -37,6 +40,42 @@ final class File implements FileInterface
         }
 
         return new self($path);
+    }
+
+    /**
+     * @param PsrStreamInterface|resource|string $from
+     */
+    public static function from(mixed $from): self
+    {
+        if ($from instanceof PsrStreamInterface) {
+            $file = self::temp();
+            $file->copy($from);
+            $file->rewind();
+
+            return $file;
+        }
+
+        if (is_string($from)) {
+            if (file_exists($from)) {
+                return new self($from);
+            }
+
+            $file = self::temp();
+            $file->write($from);
+            $file->rewind();
+
+            return $file;
+        }
+
+        if (is_resource($from)) {
+            $file = self::temp();
+            $file->copy(new Stream($from));
+            $file->rewind();
+
+            return $file;
+        }
+
+        throw new InvalidArgumentException(sprintf('Cannot create %s from %s.', self::class, get_debug_type($from)));
     }
 
     public function getPath(): string
