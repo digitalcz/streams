@@ -85,4 +85,44 @@ class BufferedStreamTest extends StreamIntegrationTest
 
         return new BufferedStream($source);
     }
+
+    public function testBufferedStreamIsNotWritable(): void
+    {
+        $this->expectException(StreamException::class);
+        $this->expectExceptionMessage('This stream is not writable');
+
+        $stream = Stream::from('test');
+        $buffered = new BufferedStream($stream);
+        $buffered->write('foo');
+    }
+
+    public function testCopyIsNotWritable(): void
+    {
+        $this->expectException(StreamException::class);
+        $this->expectExceptionMessage('This stream is not writable');
+
+        $stream = Stream::from('foo');
+        $buffered = new BufferedStream($stream);
+        $buffered->copy(Stream::from('bar'));
+    }
+
+    public function testDetach(): void
+    {
+        $alphabet = implode('', range('a', 'z'));
+
+        $stream = Stream::from($alphabet);
+        $buffered = new BufferedStream($stream);
+
+        // detaching will return new resource with all contents
+        $resource = $buffered->detach();
+
+        // original stream will be closed
+        self::assertFalse($stream->isReadable());
+        self::assertFalse($stream->isWritable());
+        self::assertIsResource($resource);
+
+        $controlStream = Stream::from($resource);
+        $controlStream->rewind();
+        self::assertSame($alphabet, $controlStream->getContents());
+    }
 }
