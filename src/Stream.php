@@ -84,10 +84,9 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * @param string|null $key
      * @return array<string, mixed>|mixed|null
      */
-    public function getMetadata($key = null)
+    public function getMetadata(?string $key = null)
     {
         if (!isset($this->resource)) {
             return $key !== null ? null : [];
@@ -131,11 +130,7 @@ final class Stream implements StreamInterface
         return $this->seekable;
     }
 
-    /**
-     * @param int $offset
-     * @param int $whence
-     */
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         $handle = $this->getHandle();
 
@@ -211,10 +206,7 @@ final class Stream implements StreamInterface
         $this->seek(0);
     }
 
-    /**
-     * @param int $length
-     */
-    public function read($length): string
+    public function read(int $length): string
     {
         if ($length < 0) {
             throw new StreamException('Length parameter cannot be negative');
@@ -239,10 +231,7 @@ final class Stream implements StreamInterface
         return $string;
     }
 
-    /**
-     * @param string $string
-     */
-    public function write($string): int
+    public function write(string $string): int
     {
         $handle = $this->getHandle();
 

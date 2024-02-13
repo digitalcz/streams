@@ -9,10 +9,9 @@ use Psr\Http\Message\StreamInterface as PsrStreamInterface;
 interface StreamInterface extends PsrStreamInterface
 {
     /**
-     * @param string|null $key
      * @return array<string, mixed>|mixed|null
      */
-    public function getMetadata($key = null);
+    public function getMetadata(?string $key = null);
 
     public function close(): void;
 
@@ -23,11 +22,7 @@ interface StreamInterface extends PsrStreamInterface
 
     public function isSeekable(): bool;
 
-    /**
-     * @param int $offset
-     * @param int $whence
-     */
-    public function seek($offset, $whence = SEEK_SET): void;
+    public function seek(int $offset, int $whence = SEEK_SET): void;
 
     public function getContents(): string;
 
@@ -43,15 +38,9 @@ interface StreamInterface extends PsrStreamInterface
 
     public function rewind(): void;
 
-    /**
-     * @param int $length
-     */
-    public function read($length): string;
+    public function read(int $length): string;
 
-    /**
-     * @param string $string
-     */
-    public function write($string): int;
+    public function write(string $string): int;
 
     public function copy(PsrStreamInterface $source): int;
 }
