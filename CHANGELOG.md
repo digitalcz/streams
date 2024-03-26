@@ -9,8 +9,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Change the prefix in File::temp()
 
 ## [0.5.0]
+### Added
+- Improve test coverage for BufferedStream
+
 ### Changed
-- Dependencies updates
+- Update dependencies
 
 ## [0.4.0]
 ### Added
