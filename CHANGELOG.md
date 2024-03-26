@@ -4,14 +4,19 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [Unreleased]
+## [0.6.0]
+### Changed
+- Change the prefix in File::temp()
+
+## [0.5.0]
+### Changed
+- Dependencies updates
+
+## [0.4.0]
 ### Added
 - Add more tests
 - Add StreamDecoratorTrait test
 - Improve test coverage
-
-### Changed
-- Change the prefix in File::temp()
 
 ## [0.3.0] 2022-02-27
 ### Added
