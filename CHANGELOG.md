@@ -10,6 +10,9 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Add StreamDecoratorTrait test
 - Improve test coverage
 
+### Changed
+- Change the prefix in File::temp()
+
 ## [0.3.0] 2022-02-27
 ### Added
 - Add BufferedStream that buffers stream data, to make it seekable
