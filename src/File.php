@@ -33,7 +33,7 @@ final class File implements FileInterface
 
     public static function temp(): self
     {
-        $path = tempnam(sys_get_temp_dir(), 'temp');
+        $path = tempnam(sys_get_temp_dir(), 'digitalcz-streams-temp');
 
         if (!is_string($path)) {
             throw new StreamException('Failed to create temp name');
