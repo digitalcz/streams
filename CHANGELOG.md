@@ -4,6 +4,9 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [1.0.0]
+First stable release 🚀
+
 ## [0.6.0]
 ### Changed
 - Change the prefix in File::temp()
