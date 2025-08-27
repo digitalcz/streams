@@ -11,9 +11,7 @@ use InvalidArgumentException;
  */
 final class StreamWrapper
 {
-    /**
-     * @var resource
-     */
+    /** @var resource */
     public $context;
     private StreamInterface $stream;
     private string $mode;
