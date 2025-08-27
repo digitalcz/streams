@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [Unreleased]
+### Fixed
+- Fix missing space in File exception message
+
 ## [1.0.0]
 First stable release 🚀
 

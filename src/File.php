@@ -18,7 +18,7 @@ final class File implements FileInterface
         $resource = @fopen($path, $mode);
 
         if (!is_resource($resource)) {
-            throw new StreamException('Failed to open file' . $path);
+            throw new StreamException('Failed to open file ' . $path);
         }
 
         $size = @filesize($path);
