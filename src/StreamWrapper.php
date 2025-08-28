@@ -71,7 +71,12 @@ final class StreamWrapper
     {
         $options = stream_context_get_options($this->context);
 
-        if (!isset($options['digitalcz-streams']['stream'])) {
+        if (
+            !isset($options['digitalcz-streams'])
+            || !is_array($options['digitalcz-streams'])
+            || !isset($options['digitalcz-streams']['stream'])
+            || !($options['digitalcz-streams']['stream'] instanceof StreamInterface)
+        ) {
             return false;
         }
 
@@ -129,6 +134,7 @@ final class StreamWrapper
      */
     public function stream_stat(): array // phpcs:ignore
     {
+        /** @var array<string, int> $modeMap */
         static $modeMap = [
             'r' => 33060,
             'rb' => 33060,
@@ -140,7 +146,7 @@ final class StreamWrapper
         return [
             'dev' => 0,
             'ino' => 0,
-            'mode' => $modeMap[$this->mode],
+            'mode' => $modeMap[$this->mode] ?? 0,
             'nlink' => 0,
             'uid' => 0,
             'gid' => 0,
