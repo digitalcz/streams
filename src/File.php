@@ -18,13 +18,18 @@ final class File implements FileInterface
         $resource = @fopen($path, $mode);
 
         if (!is_resource($resource)) {
-            throw new StreamException('Failed to open file ' . $path);
+            $error = error_get_last();
+
+            throw new StreamException('Failed to open file ' . $path . ': ' . ($error['message'] ?? 'Unknown error'));
         }
 
         $size = @filesize($path);
 
         if (!is_int($size)) {
-            throw new StreamException('Failed to get size of ' . $path);
+            fclose($resource);
+            $error = error_get_last();
+
+            throw new StreamException('Failed to get size of ' . $path . ': ' . ($error['message'] ?? 'Unknown error'));
         }
 
         $this->path = $path;

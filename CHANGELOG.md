@@ -5,11 +5,18 @@ All notable changes will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [Unreleased]
+### Added
+- Add memory protection with 100MB limit for string streams
+- Add detailed system error messages in File class for better debugging
+- Add comprehensive tests for large string handling and buffer size verification
+
 ### Changed
 - Update development dependencies
 
 ### Fixed
+- Fix incorrect buffer size calculation (1024 ^ 2 → 1024 * 1024) in BufferedStream and Stream classes
 - Fix missing space in File exception message
+- Fix missing space in clone operator in StreamWrapper
 
 ## [1.0.0]
 First stable release 🚀
