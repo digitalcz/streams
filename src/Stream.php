@@ -69,6 +69,11 @@ final class Stream implements StreamInterface
         }
 
         if (is_string($from)) {
+            // Prevent memory exhaustion with very large strings
+            if (strlen($from) > 100 * 1024 * 1024) { // 100MB limit
+                throw new InvalidArgumentException('String too large for memory stream (max 100MB)');
+            }
+
             $stream = self::temp('rb+');
             $stream->write($from);
             $stream->rewind();
@@ -270,7 +275,7 @@ final class Stream implements StreamInterface
         $bytes = false;
 
         while (!$source->eof()) {
-            $bytes = $this->write($source->read(1024 ^ 2));
+            $bytes = $this->write($source->read(1024 * 1024));
 
             if ($bytes === 0) {
                 break;

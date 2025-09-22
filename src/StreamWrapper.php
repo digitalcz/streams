@@ -123,7 +123,7 @@ final class StreamWrapper
      */
     public function stream_cast(int $cast_as) // phpcs:ignore
     {
-        $stream = clone$this->stream;
+        $stream = clone $this->stream;
         $resource = $stream->detach();
 
         return $resource ?? false;

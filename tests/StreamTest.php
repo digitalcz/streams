@@ -74,6 +74,26 @@ class StreamTest extends StreamIntegrationTest
         self::assertSame('test', $stream->getContents());
     }
 
+    public function testFromStringThrowsExceptionForLargeString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('String too large for memory stream (max 100MB)');
+
+        // Create a string larger than 100MB (100 * 1024 * 1024 + 1)
+        $largeString = str_repeat('x', 100 * 1024 * 1024 + 1);
+        Stream::from($largeString);
+    }
+
+    public function testFromStringWorksWithMaxAllowedSize(): void
+    {
+        // Create a string exactly at the 100MB limit
+        $maxString = str_repeat('x', 100 * 1024 * 1024);
+        $stream = Stream::from($maxString);
+
+        self::assertSame(100 * 1024 * 1024, $stream->getSize());
+        self::assertSame('x', $stream->read(1)); // Verify content is correct
+    }
+
     public function testStreamDoesNotCloseAutomaticallyAfterDestroy(): void
     {
         $handle = $this->createTempResource('r');
@@ -393,6 +413,41 @@ class StreamTest extends StreamIntegrationTest
     public function createStream($data)
     {
         return Stream::from($data);
+    }
+
+    public function testCopyUsesCorrectBufferSize(): void
+    {
+        // Create a source stream with known content larger than old buffer size (1026 bytes)
+        $sourceContent = str_repeat('A', 2000); // 2KB content
+        $sourceStream = Stream::from($sourceContent);
+
+        // Create destination stream
+        $destStream = Stream::temp('w+');
+
+        // Copy the content
+        $destStream->copy($sourceStream);
+        $destStream->rewind();
+
+        // Verify all content was copied correctly
+        self::assertSame($sourceContent, $destStream->getContents());
+        self::assertSame(2000, $destStream->getSize());
+    }
+
+    public function testBufferedStreamUsesCorrectBufferSize(): void
+    {
+        // Create content larger than old buffer size (1026 bytes)
+        $content = str_repeat('B', 2000); // 2KB content
+        $sourceStream = Stream::from($content);
+
+        // Create buffered stream
+        $bufferedStream = new BufferedStream($sourceStream);
+
+        // Get all contents (this uses the buffer size internally)
+        $result = $bufferedStream->getContents();
+
+        // Verify all content was read correctly
+        self::assertSame($content, $result);
+        self::assertSame(2000, strlen($result));
     }
 
     private function assertStreamStateAfterClosedOrDetached(Stream $stream): void

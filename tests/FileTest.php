@@ -20,6 +20,18 @@ class FileTest extends TestCase
         new File('foo', 'r');
     }
 
+    public function testOpenNonExistentFileIncludesSystemError(): void
+    {
+        try {
+            new File('nonexistent-file-123', 'r');
+            self::fail('Expected StreamException to be thrown');
+        } catch (StreamException $e) {
+            // Verify the exception message includes both the file path and system error
+            self::assertStringContainsString('Failed to open file nonexistent-file-123:', $e->getMessage());
+            self::assertStringContainsString('No such file or directory', $e->getMessage());
+        }
+    }
+
     public function testCreateAndDelete(): void
     {
         $path = tempnam(sys_get_temp_dir(), 'temp');

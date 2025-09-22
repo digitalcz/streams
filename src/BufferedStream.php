@@ -91,7 +91,7 @@ final class BufferedStream implements StreamInterface
         $data = '';
 
         while (!$this->eof()) {
-            $data .= $this->read(1024 ^ 2);
+            $data .= $this->read(1024 * 1024);
         }
 
         return $data;
