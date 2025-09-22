@@ -5,13 +5,19 @@ All notable changes will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [Unreleased]
+
+## [1.1.0] - 2025-09-22
 ### Added
+- Add PHP 8.4 support
 - Add memory protection with 100MB limit for string streams
 - Add detailed system error messages in File class for better debugging
 - Add comprehensive tests for large string handling and buffer size verification
+- Add composer-normalize tool for consistent composer.json structure
 
 ### Changed
-- Update development dependencies
+- Update development dependencies (PHPStan, coding standards)
+- Normalize composer.json structure
+- Improve type safety with updated PHPStan dependencies
 
 ### Fixed
 - Fix incorrect buffer size calculation (1024 ^ 2 → 1024 * 1024) in BufferedStream and Stream classes
