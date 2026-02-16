@@ -28,8 +28,8 @@ class FileTest extends TestCase
         } catch (StreamException $e) {
             // Verify the exception message includes the file path
             self::assertStringContainsString('Failed to open file nonexistent-file-123:', $e->getMessage());
-            // Verify the exception message includes some error information (not empty)
-            self::assertGreaterThan(strlen('Failed to open file nonexistent-file-123:'), strlen($e->getMessage()));
+            // Verify the exception message includes system error information after the colon
+            self::assertMatchesRegularExpression('/Failed to open file nonexistent-file-123: .+/', $e->getMessage());
         }
     }
 
