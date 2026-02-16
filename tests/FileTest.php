@@ -46,7 +46,9 @@ class FileTest extends TestCase
     {
         $file = File::temp();
 
-        self::assertStringStartsWith(sys_get_temp_dir(), $file->getPath());
+        $tempDir = sys_get_temp_dir();
+        self::assertNotEmpty($tempDir);
+        self::assertStringStartsWith($tempDir, $file->getPath());
         self::assertSame('plainfile', $file->getMetadata('wrapper_type'));
         self::assertSame('STDIO', $file->getMetadata('stream_type'));
     }
