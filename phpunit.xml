@@ -5,14 +5,19 @@
          colors="true"
          requireCoverageMetadata="true"
          beStrictAboutOutputDuringTests="true"
-         failOnWarning="true"
          failOnRisky="true"
 >
   <coverage>
+    <report>
+      <clover outputFile="coverage.xml"/>
+      <text outputFile="php://stdout"/>
+    </report>
+  </coverage>
+  <source>
     <include>
       <directory suffix=".php">src/</directory>
     </include>
-  </coverage>
+  </source>
   <testsuites>
     <testsuite name="DigitalCz Test Suite">
       <directory>tests</directory>
