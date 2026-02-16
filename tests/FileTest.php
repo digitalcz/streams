@@ -26,9 +26,7 @@ class FileTest extends TestCase
             new File('nonexistent-file-123', 'r');
             self::fail('Expected StreamException to be thrown');
         } catch (StreamException $e) {
-            // Verify the exception message includes the file path
-            self::assertStringContainsString('Failed to open file nonexistent-file-123:', $e->getMessage());
-            // Verify the exception message includes system error information after the colon
+            // Verify the exception message includes the file path and system error information
             self::assertMatchesRegularExpression('/Failed to open file nonexistent-file-123: .+/', $e->getMessage());
         }
     }
