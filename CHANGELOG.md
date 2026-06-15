@@ -5,6 +5,8 @@ All notable changes will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [Unreleased]
+
+## [1.1.1] - 2026-06-15
 ### Added
 - Add usage examples to README
 - Add `.editorconfig`
