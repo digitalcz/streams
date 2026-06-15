@@ -6,6 +6,7 @@ namespace DigitalCz\Streams;
 
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface as PsrStreamInterface;
+use Throwable;
 
 final class Stream implements StreamInterface
 {
@@ -303,11 +304,16 @@ final class Stream implements StreamInterface
 
     public function __toString(): string
     {
-        if ($this->isSeekable()) {
-            $this->rewind();
-        }
+        try {
+            if ($this->isSeekable()) {
+                $this->rewind();
+            }
 
-        return $this->getContents();
+            return $this->getContents();
+        } catch (Throwable) {
+            // __toString must not raise an exception to conform with PHP's string casting operations (PSR-7)
+            return '';
+        }
     }
 
     /**

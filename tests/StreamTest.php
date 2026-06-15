@@ -130,6 +130,18 @@ class StreamTest extends StreamIntegrationTest
         self::assertSame('ar', trim((string)$stream));
     }
 
+    public function testConvertsToStringReturnsEmptyForNonReadableStream(): void
+    {
+        $handle = fopen('php://output', 'w');
+        $stream = new Stream($handle); // @phpstan-ignore-line
+
+        self::assertFalse($stream->isReadable());
+        // __toString must not raise an exception to conform with PHP's string casting operations (PSR-7)
+        self::assertSame('', (string)$stream);
+
+        $stream->close();
+    }
+
     public function testGetsContents(): void
     {
         $handle = $this->createTempResource('w+');
@@ -489,9 +501,9 @@ class StreamTest extends StreamIntegrationTest
         $throws(static function () use ($stream): void {
             $stream->getContents();
         });
-        $throws(static function () use ($stream): void {
-            $stream->__toString();
-        });
+
+        // __toString must not raise an exception to conform with PHP's string casting operations (PSR-7)
+        self::assertSame('', (string)$stream);
     }
 
     /**
