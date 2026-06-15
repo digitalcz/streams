@@ -5,6 +5,16 @@ All notable changes will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [Unreleased]
+### Added
+- Add usage examples to README
+- Add `.editorconfig`
+
+### Changed
+- Update codecov badge to point to the `1.x` branch
+- Remove dead `export-ignore` entries from `.gitattributes`
+
+### Fixed
+- `Stream::__toString()` no longer throws on non-readable/detached streams, conforming to PSR-7
 
 ## [1.1.0] - 2025-09-22
 ### Added
