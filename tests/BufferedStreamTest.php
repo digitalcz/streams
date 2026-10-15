@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace DigitalCz\Streams;
 
 use Http\Psr7Test\StreamIntegrationTest;
+use PHPUnit\Framework\Attributes\CoversClass;
 
-/**
- * @covers \DigitalCz\Streams\BufferedStream
- */
+#[CoversClass(BufferedStream::class)]
 class BufferedStreamTest extends StreamIntegrationTest
 {
     /** @var mixed[] */

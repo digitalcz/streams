@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace DigitalCz\Streams;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \DigitalCz\Streams\StreamWrapper
- */
+#[CoversClass(StreamWrapper::class)]
 class StreamWrapperTest extends TestCase
 {
     public function testResource(): void

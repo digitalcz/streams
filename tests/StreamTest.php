@@ -7,11 +7,12 @@ namespace DigitalCz\Streams;
 use Http\Psr7Test\StreamIntegrationTest;
 use InvalidArgumentException;
 use LogicException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Throwable;
 
-/**
- * @covers \DigitalCz\Streams\Stream
- */
+#[CoversClass(Stream::class)]
 class StreamTest extends StreamIntegrationTest
 {
     public function testConstructorThrowsExceptionOnInvalidArgument(): void
@@ -252,10 +253,8 @@ class StreamTest extends StreamIntegrationTest
         $stream->close();
     }
 
-    /**
-     * @requires extension zlib
-     * @dataProvider gzipModeProvider
-     */
+    #[RequiresPhpExtension('zlib')]
+    #[DataProvider('gzipModeProvider')]
     public function testGzipStreamModes(string $mode, bool $readable, bool $writable): void
     {
         $r = gzopen('php://temp', $mode);
@@ -278,9 +277,7 @@ class StreamTest extends StreamIntegrationTest
         ];
     }
 
-    /**
-     * @dataProvider readableModeProvider
-     */
+    #[DataProvider('readableModeProvider')]
     public function testReadableStream(string $mode): void
     {
         $r = $this->createTempResource($mode);
@@ -327,9 +324,7 @@ class StreamTest extends StreamIntegrationTest
         $stream->close();
     }
 
-    /**
-     * @dataProvider writableModeProvider
-     */
+    #[DataProvider('writableModeProvider')]
     public function testWritableStream(string $mode): void
     {
         $r = $this->createTempResource($mode);
