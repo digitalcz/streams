@@ -5,6 +5,10 @@ All notable changes will be documented in this file.
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
 ## [Unreleased]
+### Changed
+- Require PHP 8.2 or newer (PHP 8.1 is end-of-life)
+- Allow PHPUnit 12, drop PHPUnit 10
+- Use PHPUnit attributes instead of doc-comment metadata in tests
 
 ## [1.1.1] - 2026-06-15
 ### Added

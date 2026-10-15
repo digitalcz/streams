@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace DigitalCz\Streams;
 
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-/**
- * @covers \DigitalCz\Streams\TempFile
- */
+#[CoversClass(TempFile::class)]
 class TempFileTest extends TestCase
 {
     public function testCreateAndDelete(): void
