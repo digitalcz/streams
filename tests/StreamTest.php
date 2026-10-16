@@ -403,6 +403,51 @@ class StreamTest extends StreamIntegrationTest
         self::assertEquals('test', $target->getContents());
     }
 
+    public function testCopyReturnsTotalBytesAcrossMultipleChunks(): void
+    {
+        $content = str_repeat('x', 1024 * 1024 + 10);
+        $target = Stream::temp('rb+');
+
+        self::assertSame(strlen($content), $target->copy(Stream::from($content)));
+    }
+
+    public function testCopyFromExhaustedNonSeekableSourceReturnsZero(): void
+    {
+        $resource = fopen('php://temp', 'rb+');
+        self::assertNotFalse($resource);
+        $source = new class (new Stream($resource)) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function isSeekable(): bool
+            {
+                return false;
+            }
+        };
+        $source->read(1);
+
+        self::assertSame(0, Stream::temp('rb+')->copy($source));
+    }
+
+    public function testCopyStopsWhenTargetAcceptsNoBytes(): void
+    {
+        $target = new class (Stream::temp('rb+')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public int $writes = 0;
+
+            public function write(string $string): int
+            {
+                $this->writes++;
+
+                return 0;
+            }
+        };
+        $content = str_repeat('x', 3 * 1024 * 1024);
+
+        self::assertSame(0, (new Stream(StreamWrapper::from($target)))->copy(Stream::from($content)));
+        self::assertSame(1, $target->writes);
+    }
+
     public function testCopyPurgeSize(): void
     {
         $target = Stream::temp('rb+');
