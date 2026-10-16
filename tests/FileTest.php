@@ -75,6 +75,18 @@ class FileTest extends TestCase
         self::assertSame('test', $file->getContents());
     }
 
+    public function testFromStringNeverOpensPath(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'temp');
+        self::assertNotFalse($path);
+        file_put_contents($path, 'secret');
+
+        $file = File::fromString($path);
+
+        self::assertNotSame($path, $file->getPath());
+        self::assertSame($path, $file->getContents());
+    }
+
     public function testFromResource(): void
     {
         $resource = fopen('php://temp', 'wb+');
