@@ -116,6 +116,42 @@ class AppendStreamTest extends StreamIntegrationTest
         self::assertSame('abcdef', (string)$stream);
     }
 
+    public function testReadsSeekablePartsFromTheStart(): void
+    {
+        $part = Stream::from('abc');
+        $part->read(1);
+        $stream = new AppendStream($part);
+
+        self::assertSame('a', $stream->read(1));
+        $stream->seek($stream->tell());
+        self::assertSame('b', $stream->read(1));
+    }
+
+    public function testDetachedStreamIsUnusable(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'));
+
+        $stream->detach();
+
+        self::assertFalse($stream->isReadable());
+        self::assertFalse($stream->isSeekable());
+        self::assertNull($stream->getSize());
+        self::assertSame('', (string)$stream);
+
+        $this->expectException(StreamException::class);
+        $this->expectExceptionMessage('Stream is detached');
+        $stream->read(1);
+    }
+
+    public function testCopyFromClosedStreamFails(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'));
+        $stream->close();
+
+        $this->expectException(StreamException::class);
+        Stream::temp('w+b')->copy($stream);
+    }
+
     public function testCloseClosesAllParts(): void
     {
         $first = Stream::from('abc');
@@ -126,7 +162,7 @@ class AppendStreamTest extends StreamIntegrationTest
 
         self::assertFalse($first->isReadable());
         self::assertFalse($second->isReadable());
-        self::assertTrue($stream->eof());
+        self::assertFalse($stream->isReadable());
     }
 
     public function testSeekPastEndStopsAtEnd(): void

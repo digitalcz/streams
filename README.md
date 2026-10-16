@@ -115,7 +115,8 @@ $chunk = $window->getContents();             // bytes 50–149 of $stream
 
 ### AppendStream
 
-Reads several streams one after another as if they were one. It is read-only,
+Reads several streams one after another as if they were one (seekable parts are
+read from the start). It is read-only,
 seekable only if all parts are, and its size is unknown if any part's size is.
 
 ```php

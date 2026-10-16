@@ -13,8 +13,8 @@ use Throwable;
  */
 final class AppendStream implements StreamInterface
 {
-    /** @var list<StreamInterface> */
-    private array $streams;
+    /** @var list<StreamInterface>|null Null once detached */
+    private ?array $streams;
 
     private int $current = 0;
 
@@ -26,6 +26,10 @@ final class AppendStream implements StreamInterface
             if (!$stream->isReadable()) {
                 throw new InvalidArgumentException('All streams must be readable');
             }
+
+            if ($stream->isSeekable()) {
+                $stream->rewind();
+            }
         }
 
         $this->streams = array_values($streams);
@@ -33,6 +37,10 @@ final class AppendStream implements StreamInterface
 
     public function getSize(): ?int
     {
+        if ($this->streams === null) {
+            return null;
+        }
+
         $size = 0;
 
         foreach ($this->streams as $stream) {
@@ -50,9 +58,10 @@ final class AppendStream implements StreamInterface
 
     public function eof(): bool
     {
-        $last = count($this->streams) - 1;
+        $streams = $this->parts();
+        $last = count($streams) - 1;
 
-        return $this->current > $last || ($this->current === $last && $this->streams[$last]->eof());
+        return $this->current > $last || ($this->current === $last && $streams[$last]->eof());
     }
 
     public function tell(): int
@@ -62,6 +71,10 @@ final class AppendStream implements StreamInterface
 
     public function isSeekable(): bool
     {
+        if ($this->streams === null) {
+            return false;
+        }
+
         foreach ($this->streams as $stream) {
             if (!$stream->isSeekable()) {
                 return false;
@@ -73,6 +86,8 @@ final class AppendStream implements StreamInterface
 
     public function seek(int $offset, int $whence = SEEK_SET): void
     {
+        $streams = $this->parts();
+
         if (!$this->isSeekable()) {
             throw new StreamException('Stream is not seekable');
         }
@@ -88,7 +103,7 @@ final class AppendStream implements StreamInterface
             throw new StreamException("Unable to seek to stream position {$position}");
         }
 
-        foreach ($this->streams as $stream) {
+        foreach ($streams as $stream) {
             $stream->rewind();
         }
 
@@ -113,10 +128,11 @@ final class AppendStream implements StreamInterface
             throw new StreamException('Length parameter cannot be negative');
         }
 
+        $streams = $this->parts();
         $data = '';
 
-        while (strlen($data) < $length && $this->current < count($this->streams)) {
-            $stream = $this->streams[$this->current];
+        while (strlen($data) < $length && $this->current < count($streams)) {
+            $stream = $streams[$this->current];
             $chunk = $stream->read($length - strlen($data));
             $data .= $chunk;
 
@@ -153,7 +169,7 @@ final class AppendStream implements StreamInterface
 
     public function isReadable(): bool
     {
-        return true;
+        return $this->streams !== null;
     }
 
     public function isWritable(): bool
@@ -173,7 +189,7 @@ final class AppendStream implements StreamInterface
 
     public function close(): void
     {
-        foreach ($this->streams as $stream) {
+        foreach ($this->streams ?? [] as $stream) {
             $stream->close();
         }
 
@@ -185,7 +201,7 @@ final class AppendStream implements StreamInterface
      */
     public function detach()
     {
-        $this->streams = [];
+        $this->streams = null;
         $this->current = 0;
         $this->position = 0;
 
@@ -209,5 +225,13 @@ final class AppendStream implements StreamInterface
         } catch (Throwable) {
             return '';
         }
+    }
+
+    /**
+     * @return list<StreamInterface>
+     */
+    private function parts(): array
+    {
+        return $this->streams ?? throw new StreamException('Stream is detached');
     }
 }
