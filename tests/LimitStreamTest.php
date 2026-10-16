@@ -140,6 +140,44 @@ class LimitStreamTest extends StreamIntegrationTest
         $stream->seek(0, SEEK_END);
     }
 
+    public function testStalledSourceDoesNotLoopForever(): void
+    {
+        $stalled = new class (Stream::from('')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function eof(): bool
+            {
+                return false;
+            }
+        };
+        $stream = new LimitStream($stalled, 10);
+
+        self::assertSame('', $stream->getContents());
+    }
+
+    public function testToStringReturnsEmptyStringOnError(): void
+    {
+        $failing = new class (Stream::from('abc')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function read(int $length): string
+            {
+                throw new StreamException('Read failed');
+            }
+        };
+        $stream = new LimitStream($failing, 2);
+
+        self::assertSame('', (string)$stream);
+    }
+
+    public function testInvalidWhenceIsRejected(): void
+    {
+        $stream = new LimitStream(Stream::from('abc'), 2);
+
+        $this->expectException(InvalidArgumentException::class);
+        $stream->seek(0, 42);
+    }
+
     public function testNegativeLimitIsRejected(): void
     {
         $this->expectException(InvalidArgumentException::class);

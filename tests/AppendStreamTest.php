@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DigitalCz\Streams;
 
 use Http\Psr7Test\StreamIntegrationTest;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(AppendStream::class)]
@@ -126,6 +127,94 @@ class AppendStreamTest extends StreamIntegrationTest
         self::assertFalse($first->isReadable());
         self::assertFalse($second->isReadable());
         self::assertTrue($stream->eof());
+    }
+
+    public function testSeekPastEndStopsAtEnd(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'), Stream::from('def'));
+
+        $stream->seek(100);
+
+        self::assertSame(6, $stream->tell());
+        self::assertTrue($stream->eof());
+    }
+
+    public function testStalledPartDoesNotSkipToNextPart(): void
+    {
+        $stalled = new class (Stream::from('')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function eof(): bool
+            {
+                return false;
+            }
+        };
+        $stream = new AppendStream(Stream::from('abc'), $stalled, Stream::from('def'));
+
+        self::assertSame('abc', $stream->getContents());
+        self::assertFalse($stream->eof());
+    }
+
+    public function testToStringReturnsEmptyStringOnError(): void
+    {
+        $failing = new class (Stream::from('def')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function read(int $length): string
+            {
+                throw new StreamException('Read failed');
+            }
+        };
+        $stream = new AppendStream(Stream::from('abc'), $failing);
+
+        self::assertSame('', (string)$stream);
+    }
+
+    public function testUnreadablePartIsRejected(): void
+    {
+        $unreadable = new class (Stream::from('def')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function isReadable(): bool
+            {
+                return false;
+            }
+        };
+
+        $this->expectException(InvalidArgumentException::class);
+        new AppendStream(Stream::from('abc'), $unreadable);
+    }
+
+    public function testSeekBeforeStartThrows(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'));
+
+        $this->expectException(StreamException::class);
+        $stream->seek(-1);
+    }
+
+    public function testInvalidWhenceIsRejected(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $stream->seek(0, 42);
+    }
+
+    public function testNegativeReadLengthThrows(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'));
+
+        $this->expectException(StreamException::class);
+        $stream->read(-1);
+    }
+
+    public function testHasNoMetadata(): void
+    {
+        $stream = new AppendStream(Stream::from('abc'));
+
+        self::assertSame([], $stream->getMetadata());
+        self::assertNull($stream->getMetadata('uri'));
     }
 
     public function testAppendStreamIsNotWritable(): void
