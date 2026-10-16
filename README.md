@@ -139,6 +139,20 @@ $resource = StreamWrapper::from($stream);
 $line = fgets($resource);
 ```
 
+### StreamInfo
+
+Hashes or detects the MIME type of any PSR-7 stream without loading it all into
+memory. Seekable streams are read from the start and their position is restored.
+Non-seekable streams are read from the current position and the bytes read are
+consumed — wrap them in `BufferedStream` if you need them again.
+
+```php
+use DigitalCz\Streams\StreamInfo;
+
+$sha256 = StreamInfo::hash($stream, 'sha256');   // any algorithm from hash_algos()
+$mimeType = StreamInfo::mimeType($stream);        // e.g. "application/pdf", requires ext-fileinfo
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.

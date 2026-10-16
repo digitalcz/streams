@@ -39,6 +39,9 @@
     "squizlabs/php_codesniffer": "^4.0",
     "symfony/var-dumper": "^6.4 || ^7.4 || ^8.0"
   },
+  "suggest": {
+    "ext-fileinfo": "Required to detect MIME type with StreamInfo::mimeType()"
+  },
   "autoload": {
     "psr-4": {
       "DigitalCz\\Streams\\": "src"

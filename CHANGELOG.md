@@ -9,6 +9,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `File::fromString()` that always treats the string as content, never as a path
 - `LimitStream`, a read-only view of a window (offset + limit) of another stream
 - `AppendStream`, a read-only stream that reads several streams one after another
+- `StreamInfo::hash()` that hashes any PSR-7 stream in chunks without loading it into memory
+- `StreamInfo::mimeType()` that detects the MIME type of any PSR-7 stream from its first chunk (requires `ext-fileinfo`)
 
 ### Deprecated
 - Passing a string to `File::from()`: an existing path opens that file instead of using the string as content, which is unsafe with untrusted input. Use `File::fromString()` or `new File($path)`

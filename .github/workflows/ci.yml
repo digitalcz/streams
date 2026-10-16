@@ -31,7 +31,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, zip
+          extensions: mbstring, zip, fileinfo
           tools: cs2pr
           coverage: pcov
 
