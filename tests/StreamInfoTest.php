@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(StreamInfo::class)]
 class StreamInfoTest extends TestCase
 {
+    private const PNG = "\x89PNG\r\n\x1a\n\0\0\0\rIHDR\0\0\0\x01\0\0\0\x01\x08\x06\0\0\0\x1f\x15\xc4\x89";
+
     public function testHashMatchesKnownDigest(): void
     {
         self::assertSame(
@@ -83,7 +85,7 @@ class StreamInfoTest extends TestCase
      */
     public static function provideMimeTypes(): iterable
     {
-        yield 'png' => ["\x89PNG\r\n\x1a\n\0\0\0\rIHDR\0\0\0\x01\0\0\0\x01\x08\x06\0\0\0\x1f\x15\xc4\x89", 'image/png'];
+        yield 'png' => [self::PNG, 'image/png'];
         yield 'pdf' => ["%PDF-1.4\n%\xe2\xe3\xcf\xd3\n", 'application/pdf'];
         yield 'text' => ['Hello world, this is plain text.', 'text/plain'];
     }
@@ -109,6 +111,43 @@ class StreamInfoTest extends TestCase
     public function testMimeTypeOfNonSeekableStream(): void
     {
         self::assertSame('application/pdf', StreamInfo::mimeType($this->nonSeekable('%PDF-1.4')));
+    }
+
+    #[RequiresPhpExtension('fileinfo')]
+    public function testMimeTypeCollectsShortReads(): void
+    {
+        $stream = new class (Stream::from(self::PNG)) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function read(int $length): string
+            {
+                return $this->stream->read(min($length, 2));
+            }
+        };
+
+        self::assertSame('image/png', StreamInfo::mimeType($stream));
+    }
+
+    #[RequiresPhpExtension('fileinfo')]
+    public function testMimeTypeOfEmptyStream(): void
+    {
+        self::assertSame('application/x-empty', StreamInfo::mimeType(Stream::from('')));
+    }
+
+    #[RequiresPhpExtension('fileinfo')]
+    public function testMimeTypeThrowsInsteadOfDetectingFromPartialContent(): void
+    {
+        $stream = new class (Stream::from('%PDF-1.4')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function read(int $length): string
+            {
+                return '';
+            }
+        };
+
+        $this->expectException(StreamException::class);
+        StreamInfo::mimeType($stream);
     }
 
     public function testMimeTypeThrowsOnUnreadableStream(): void

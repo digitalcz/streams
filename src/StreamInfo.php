@@ -53,7 +53,23 @@ final class StreamInfo
         }
 
         return self::read($stream, static function (PsrStreamInterface $stream): string {
-            $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($stream->read(self::CHUNK_SIZE));
+            $head = '';
+
+            while (strlen($head) < self::CHUNK_SIZE) {
+                $chunk = $stream->read(self::CHUNK_SIZE - strlen($head));
+
+                if ($chunk === '') {
+                    if (!$stream->eof()) {
+                        throw new StreamException('Stream returned no data before its end, unable to detect MIME type');
+                    }
+
+                    break;
+                }
+
+                $head .= $chunk;
+            }
+
+            $mimeType = (new finfo(FILEINFO_MIME_TYPE))->buffer($head);
 
             if (!is_string($mimeType)) {
                 throw new StreamException('Unable to detect MIME type');
