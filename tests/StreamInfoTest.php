@@ -20,6 +20,11 @@ class StreamInfoTest extends TestCase
         );
     }
 
+    public function testHashOfEmptyStream(): void
+    {
+        self::assertSame(hash('sha256', ''), StreamInfo::hash(Stream::from(''), 'sha256'));
+    }
+
     public function testHashOfContentSpanningMultipleChunks(): void
     {
         $content = str_repeat('0123456789', 250_000) . 'x';
