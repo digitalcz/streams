@@ -168,7 +168,12 @@ final class BufferedStream implements StreamInterface
         }
 
         $position = $this->tell();
-        $this->getContents();
+        $this->buffer->seek($this->written);
+
+        while (!$this->eof()) {
+            $this->read(1024 * 1024);
+        }
+
         $this->buffer->seek($position);
 
         return $this->written;

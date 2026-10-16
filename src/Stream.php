@@ -282,7 +282,12 @@ final class Stream implements StreamInterface
                 break;
             }
 
-            $bytes += $this->write($chunk);
+            $written = $this->write($chunk);
+            $bytes += $written;
+
+            if ($written === 0) {
+                break;
+            }
         }
 
         if ($seekable) {
