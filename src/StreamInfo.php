@@ -31,14 +31,12 @@ final class StreamInfo
         return self::read($stream, static function (PsrStreamInterface $stream) use ($algo): string {
             $context = hash_init($algo);
 
-            while (!$stream->eof()) {
-                $chunk = $stream->read(self::CHUNK_SIZE);
-
-                if ($chunk === '') {
-                    break;
-                }
-
+            while (($chunk = $stream->read(self::CHUNK_SIZE)) !== '') {
                 hash_update($context, $chunk);
+            }
+
+            if (!$stream->eof()) {
+                throw new StreamException('Stream returned no data before its end, unable to hash it');
             }
 
             return hash_final($context);

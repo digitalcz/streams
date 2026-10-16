@@ -51,6 +51,21 @@ class StreamInfoTest extends TestCase
         self::assertSame(hash('sha256', 'world'), StreamInfo::hash($stream, 'sha256'));
     }
 
+    public function testHashThrowsInsteadOfHashingPartialContent(): void
+    {
+        $stream = new class (Stream::from('hello world')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function read(int $length): string
+            {
+                return '';
+            }
+        };
+
+        $this->expectException(StreamException::class);
+        StreamInfo::hash($stream, 'sha256');
+    }
+
     public function testHashThrowsOnUnknownAlgorithm(): void
     {
         $this->expectException(StreamException::class);
