@@ -101,6 +101,32 @@ $buffered->rewind();                         // works even if the source could n
 $all = $buffered->getContents();
 ```
 
+### LimitStream
+
+Read-only view of a window of another stream: at most `$limit` bytes starting
+at `$offset`. Size, position and seeking are relative to the window.
+
+```php
+use DigitalCz\Streams\LimitStream;
+
+$window = new LimitStream($stream, limit: 100, offset: 50);
+$chunk = $window->getContents();             // bytes 50–149 of $stream
+```
+
+### AppendStream
+
+Reads several streams one after another as if they were one (seekable parts are
+read from the start). It is read-only,
+seekable only if all parts are, and its size is unknown if any part's size is.
+
+```php
+use DigitalCz\Streams\AppendStream;
+use DigitalCz\Streams\Stream;
+
+$stream = new AppendStream(Stream::from('header'), $body, Stream::from('footer'));
+$all = $stream->getContents();
+```
+
 ### StreamWrapper
 
 Turns a `StreamInterface` back into a native PHP stream resource, usable with
