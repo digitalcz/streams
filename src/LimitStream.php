@@ -30,7 +30,7 @@ final class LimitStream implements StreamInterface
         $this->offset = $offset;
 
         if ($stream->tell() !== $offset) {
-            $stream->seek($offset);
+            $this->seekSource(0);
         }
     }
 
@@ -52,7 +52,7 @@ final class LimitStream implements StreamInterface
 
     public function tell(): int
     {
-        return $this->stream->tell() - $this->offset;
+        return max(0, $this->stream->tell() - $this->offset);
     }
 
     public function seek(int $offset, int $whence = SEEK_SET): void
@@ -68,7 +68,7 @@ final class LimitStream implements StreamInterface
             throw new StreamException("Unable to seek to stream position {$position}");
         }
 
-        $this->stream->seek($this->offset + min($position, $this->limit));
+        $this->seekSource($position);
     }
 
     public function rewind(): void
@@ -130,5 +130,18 @@ final class LimitStream implements StreamInterface
         } catch (Throwable) {
             return '';
         }
+    }
+
+    private function seekSource(int $position): void
+    {
+        $target = $this->offset + min($position, $this->limit);
+        $size = $this->stream->getSize();
+
+        // Seeking past the end fails on some streams (e.g. php://temp before PHP 8.3)
+        if ($size !== null) {
+            $target = min($target, $size);
+        }
+
+        $this->stream->seek($target);
     }
 }

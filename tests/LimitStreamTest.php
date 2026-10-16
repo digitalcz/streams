@@ -57,6 +57,10 @@ class LimitStreamTest extends StreamIntegrationTest
         self::assertSame(2, $stream->getSize());
         self::assertSame('ef', $stream->getContents());
         self::assertTrue($stream->eof());
+
+        $stream->seek(10);
+        self::assertSame(2, $stream->tell());
+        self::assertSame('', $stream->read(1));
     }
 
     public function testOffsetBeyondEndOfSource(): void
@@ -64,7 +68,12 @@ class LimitStreamTest extends StreamIntegrationTest
         $stream = new LimitStream(Stream::from('abc'), 10, 5);
 
         self::assertSame(0, $stream->getSize());
+        self::assertSame(0, $stream->tell());
         self::assertSame('', $stream->getContents());
+        self::assertTrue($stream->eof());
+
+        $stream->seek(3);
+        self::assertSame(0, $stream->tell());
     }
 
     public function testSeekIsRelativeToTheWindow(): void
