@@ -39,13 +39,14 @@ final class BufferedStream implements StreamInterface
         $offset = match ($whence) {
             SEEK_SET => $offset,
             SEEK_CUR => $offset + $this->tell(),
-            SEEK_END => $offset + ($this->getSize() ?? 0),
+            SEEK_END => $offset + $this->getSizeReadingSourceIfUnknown(),
             default => throw new InvalidArgumentException('Invalid whence'),
         };
 
         $diff = $offset - $this->written;
 
         if ($diff > 0) {
+            $this->buffer->seek($this->written);
             $this->read($diff);
         } else {
             $this->buffer->seek($offset);
@@ -156,5 +157,25 @@ final class BufferedStream implements StreamInterface
         } catch (Throwable) {
             return '';
         }
+    }
+
+    private function getSizeReadingSourceIfUnknown(): int
+    {
+        $size = $this->getSize();
+
+        if ($size !== null) {
+            return $size;
+        }
+
+        $position = $this->tell();
+        $this->buffer->seek($this->written);
+
+        while (!$this->eof()) {
+            $this->read(1024 * 1024);
+        }
+
+        $this->buffer->seek($position);
+
+        return $this->written;
     }
 }

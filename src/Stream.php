@@ -273,22 +273,25 @@ final class Stream implements StreamInterface
             $source->rewind(); // rewind source to beginning
         }
 
-        $bytes = false;
+        $bytes = 0;
 
         while (!$source->eof()) {
-            $bytes = $this->write($source->read(1024 * 1024));
+            $chunk = $source->read(1024 * 1024);
 
-            if ($bytes === 0) {
+            if ($chunk === '') {
+                break;
+            }
+
+            $written = $this->write($chunk);
+            $bytes += $written;
+
+            if ($written === 0) {
                 break;
             }
         }
 
         if ($seekable) {
             $source->seek($sourcePos); // forward source to previous position
-        }
-
-        if (!is_int($bytes)) {
-            throw new StreamException('Failed to copy stream');
         }
 
         return $bytes;

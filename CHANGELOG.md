@@ -11,6 +11,12 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Deprecated
 - Passing a string to `File::from()`: an existing path opens that file instead of using the string as content, which is unsafe with untrusted input. Use `File::fromString()` or `new File($path)`
 
+### Fixed
+- `Stream::copy()` returns the total number of copied bytes instead of the size of the last chunk
+- `Stream::copy()` no longer throws when the source is non-seekable and already at EOF
+- `BufferedStream::seek()` past the buffered data after a rewind lands on the requested position
+- `BufferedStream::seek()` with `SEEK_END` reads the source to the end when its size is unknown
+
 ## [1.2.0] - 2026-10-15
 ### Changed
 - Require PHP 8.2 or newer (PHP 8.1 is end-of-life)

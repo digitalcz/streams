@@ -57,6 +57,36 @@ class BufferedStreamTest extends StreamIntegrationTest
         self::assertSame(26, $buffered->getSize());
     }
 
+    public function testSeekBeyondBufferAfterRewind(): void
+    {
+        $buffered = new BufferedStream(Stream::from(str_repeat('a', 100) . str_repeat('b', 100)));
+        $buffered->read(100);
+        $buffered->rewind();
+
+        $buffered->seek(150);
+
+        self::assertSame(150, $buffered->tell());
+        self::assertSame('b', $buffered->read(1));
+    }
+
+    public function testSeekEndWithUnknownSourceSize(): void
+    {
+        $source = new class (Stream::from(implode('', range('a', 'z')))) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function getSize(): ?int
+            {
+                return null;
+            }
+        };
+        $buffered = new BufferedStream($source);
+
+        $buffered->seek(-1, SEEK_END);
+
+        self::assertSame(25, $buffered->tell());
+        self::assertSame('z', $buffered->read(1));
+    }
+
     public function testTell(): void
     {
         $resource = fopen('php://memory', 'wb');
