@@ -87,21 +87,33 @@ final class StreamWrapper
     }
 
     // phpcs:ignore
-    public function stream_read(int $count): string
+    public function stream_read(int $count): string|false
     {
-        return $this->stream->read($count);
+        try {
+            return $this->stream->read($count);
+        } catch (StreamException) {
+            return false;
+        }
     }
 
     // phpcs:ignore
-    public function stream_write(string $data): int
+    public function stream_write(string $data): int|false
     {
-        return $this->stream->write($data);
+        try {
+            return $this->stream->write($data);
+        } catch (StreamException) {
+            return false;
+        }
     }
 
     // phpcs:ignore
-    public function stream_tell(): int
+    public function stream_tell(): int|false
     {
-        return $this->stream->tell();
+        try {
+            return $this->stream->tell();
+        } catch (StreamException) {
+            return false;
+        }
     }
 
     // phpcs:ignore
@@ -113,7 +125,11 @@ final class StreamWrapper
     // phpcs:ignore
     public function stream_seek(int $offset, int $whence): bool
     {
-        $this->stream->seek($offset, $whence);
+        try {
+            $this->stream->seek($offset, $whence);
+        } catch (StreamException) {
+            return false;
+        }
 
         return true;
     }
@@ -123,6 +139,11 @@ final class StreamWrapper
      */
     public function stream_cast(int $cast_as) // phpcs:ignore
     {
+        // Decorators share their inner stream with a shallow clone, so detaching the clone would detach the original
+        if (!$this->stream instanceof Stream) {
+            return false;
+        }
+
         $stream = clone $this->stream;
         $resource = $stream->detach();
 
