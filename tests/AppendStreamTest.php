@@ -191,6 +191,44 @@ class AppendStreamTest extends StreamIntegrationTest
         self::assertFalse($stream->eof());
     }
 
+    public function testSeekThroughStalledPartThrows(): void
+    {
+        $stalled = new class (Stream::from('')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function eof(): bool
+            {
+                return false;
+            }
+        };
+        $stream = new AppendStream(Stream::from('abc'), $stalled, Stream::from('def'));
+
+        $this->expectException(StreamException::class);
+        $stream->seek(4);
+    }
+
+    public function testFailingPartKeepsPositionOfDataAlreadyRead(): void
+    {
+        $failing = new class (Stream::from('def')) implements StreamInterface {
+            use StreamDecoratorTrait;
+
+            public function read(int $length): string
+            {
+                throw new StreamException('Read failed');
+            }
+        };
+        $stream = new AppendStream(Stream::from('abc'), $failing);
+
+        try {
+            $stream->read(4);
+            self::fail('Expected the failing part to throw');
+        } catch (StreamException $e) {
+            self::assertSame('Read failed', $e->getMessage());
+        }
+
+        self::assertSame(3, $stream->tell());
+    }
+
     public function testToStringReturnsEmptyStringOnError(): void
     {
         $failing = new class (Stream::from('def')) implements StreamInterface {

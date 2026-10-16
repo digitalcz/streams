@@ -80,6 +80,10 @@ final class LimitStream implements StreamInterface
 
     public function read(int $length): string
     {
+        if ($length < 0) {
+            throw new StreamException('Length parameter cannot be negative');
+        }
+
         $position = $this->stream->tell() - $this->offset;
 
         // The source may sit before the window (beyond its end, or moved by someone else)

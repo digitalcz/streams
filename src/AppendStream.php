@@ -115,6 +115,10 @@ final class AppendStream implements StreamInterface
                 break;
             }
         }
+
+        if ($this->position < $position && !$this->eof()) {
+            throw new StreamException("Unable to seek to stream position {$position}");
+        }
     }
 
     public function rewind(): void
@@ -135,6 +139,7 @@ final class AppendStream implements StreamInterface
             $stream = $streams[$this->current];
             $chunk = $stream->read($length - strlen($data));
             $data .= $chunk;
+            $this->position += strlen($chunk);
 
             if ($chunk === '') {
                 if (!$stream->eof()) {
@@ -144,8 +149,6 @@ final class AppendStream implements StreamInterface
                 $this->current++;
             }
         }
-
-        $this->position += strlen($data);
 
         return $data;
     }

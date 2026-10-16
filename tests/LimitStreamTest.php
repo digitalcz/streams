@@ -178,6 +178,22 @@ class LimitStreamTest extends StreamIntegrationTest
         $stream->seek(0, 42);
     }
 
+    public function testNegativeReadLengthThrowsEvenWhenWindowIsExhausted(): void
+    {
+        $empty = new LimitStream(Stream::from('abc'), 0);
+        $exhausted = new LimitStream(Stream::from('abc'), 2);
+        $exhausted->read(2);
+
+        foreach ([$empty, $exhausted] as $stream) {
+            try {
+                $stream->read(-1);
+                self::fail('Expected negative length to throw');
+            } catch (StreamException $e) {
+                self::assertSame('Length parameter cannot be negative', $e->getMessage());
+            }
+        }
+    }
+
     public function testNegativeLimitIsRejected(): void
     {
         $this->expectException(InvalidArgumentException::class);
