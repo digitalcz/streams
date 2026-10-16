@@ -16,6 +16,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Stream::copy()` no longer throws when the source is non-seekable and already at EOF
 - `BufferedStream::seek()` past the buffered data after a rewind lands on the requested position
 - `BufferedStream::seek()` with `SEEK_END` reads the source to the end when its size is unknown
+- `StreamWrapper` no longer detaches a wrapped decorator (`File`, `TempFile`, `BufferedStream`) when the resource is cast, e.g. by `stream_select()`; casting is only supported for a wrapped `Stream`
+- `StreamWrapper` reports failed seek, tell, read and write to `fseek()`, `fread()` and `fwrite()` instead of throwing
 
 ## [1.2.0] - 2026-10-15
 ### Changed

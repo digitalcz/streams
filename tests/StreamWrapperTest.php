@@ -6,6 +6,7 @@ namespace DigitalCz\Streams;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(StreamWrapper::class)]
@@ -78,6 +79,64 @@ class StreamWrapperTest extends TestCase
         $write = null;
         $except = null;
         self::assertIsInt(stream_select($streams, $write, $except, 0));
+    }
+
+    /**
+     * @return iterable<string, array{StreamInterface}>
+     */
+    public static function decoratedStreams(): iterable
+    {
+        yield 'File' => [File::from('foo')];
+        yield 'TempFile' => [TempFile::from('foo')];
+        yield 'BufferedStream' => [new BufferedStream(Stream::from('foo'))];
+    }
+
+    #[DataProvider('decoratedStreams')]
+    public function testStreamCastDoesNotDetachDecoratedStream(StreamInterface $stream): void
+    {
+        $streams = [StreamWrapper::from(Stream::from('bar')), StreamWrapper::from($stream)];
+        $write = null;
+        $except = null;
+        @stream_select($streams, $write, $except, 0);
+
+        self::assertSame(0, $stream->tell());
+        self::assertSame('foo', (string) $stream);
+    }
+
+    public function testSeekFailureIsReportedToFseek(): void
+    {
+        $stream = self::createStub(StreamInterface::class);
+        $stream->method('isReadable')->willReturn(true);
+        $stream->method('seek')->willThrowException(new StreamException('Stream is not seekable'));
+
+        self::assertSame(-1, fseek(StreamWrapper::from($stream), 1));
+    }
+
+    public function testTellFailureIsReportedToFseek(): void
+    {
+        $stream = self::createStub(StreamInterface::class);
+        $stream->method('isReadable')->willReturn(true);
+        $stream->method('tell')->willThrowException(new StreamException('Unable to determine stream position'));
+
+        self::assertSame(-1, fseek(StreamWrapper::from($stream), 1));
+    }
+
+    public function testReadFailureIsReportedToFread(): void
+    {
+        $stream = self::createStub(StreamInterface::class);
+        $stream->method('isReadable')->willReturn(true);
+        $stream->method('read')->willThrowException(new StreamException('Unable to read from stream'));
+
+        self::assertFalse(fread(StreamWrapper::from($stream), 1));
+    }
+
+    public function testWriteFailureIsReportedToFwrite(): void
+    {
+        $stream = self::createStub(StreamInterface::class);
+        $stream->method('isWritable')->willReturn(true);
+        $stream->method('write')->willThrowException(new StreamException('Unable to write to stream'));
+
+        self::assertFalse(fwrite(StreamWrapper::from($stream), 'foo'));
     }
 
     public function testValidatesStream(): void
