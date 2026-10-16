@@ -63,8 +63,12 @@ $file = new File('/path/to/file.txt');      // opened with mode "rb+" by default
 echo $file->getPath();
 
 // Build a file from a string / resource / PSR-7 stream.
-// A string that is an existing path opens that file, otherwise it is the content.
-$file = File::from('contents written to a temp file');
+// Write a string to a new temp file (the string is never treated as a path).
+$file = File::fromString('contents written to a temp file');
+
+// File::from() also accepts a string, but an existing path opens that file,
+// otherwise it is the content. Never pass untrusted input to it.
+$file = File::from($psrStreamOrResource);
 
 $temp = File::temp();                        // empty file in the system temp dir
 $file->delete();                             // close and unlink
