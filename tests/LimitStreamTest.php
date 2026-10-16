@@ -76,6 +76,20 @@ class LimitStreamTest extends StreamIntegrationTest
         self::assertSame(0, $stream->tell());
     }
 
+    public function testNeverReadsBeforeTheWindow(): void
+    {
+        $source = Stream::from('abc');
+        $stream = new LimitStream($source, 10, 5);
+
+        $source->seek(0, SEEK_END);
+        $source->write('defgh');
+
+        self::assertSame('', $stream->read(10));
+
+        $source->seek(1);
+        self::assertSame('', $stream->read(10));
+    }
+
     public function testSeekIsRelativeToTheWindow(): void
     {
         $stream = new LimitStream(Stream::from('abcdefgh'), 4, 2);

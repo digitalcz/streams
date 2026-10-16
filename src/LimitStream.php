@@ -47,7 +47,9 @@ final class LimitStream implements StreamInterface
 
     public function eof(): bool
     {
-        return $this->stream->eof() || $this->tell() >= $this->limit;
+        $position = $this->stream->tell() - $this->offset;
+
+        return $this->stream->eof() || $position < 0 || $position >= $this->limit;
     }
 
     public function tell(): int
@@ -78,13 +80,14 @@ final class LimitStream implements StreamInterface
 
     public function read(int $length): string
     {
-        $remaining = $this->limit - $this->tell();
+        $position = $this->stream->tell() - $this->offset;
 
-        if ($length === 0 || $remaining <= 0) {
+        // The source may sit before the window (beyond its end, or moved by someone else)
+        if ($length === 0 || $position < 0 || $position >= $this->limit) {
             return '';
         }
 
-        return $this->stream->read(min($length, $remaining));
+        return $this->stream->read(min($length, $this->limit - $position));
     }
 
     public function getContents(): string
