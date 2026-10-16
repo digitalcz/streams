@@ -48,9 +48,6 @@ final class File implements FileInterface
     }
 
     /**
-     * Passing a string is ambiguous: an existing path opens that file, anything else is written as content.
-     * Never pass untrusted content here, use {@see self::fromString()} or {@see self::__construct()} instead.
-     *
      * @param PsrStreamInterface|resource|string $from
      */
     public static function from(mixed $from): self
@@ -68,7 +65,11 @@ final class File implements FileInterface
                 return new self($from);
             }
 
-            return self::fromString($from);
+            $file = self::temp();
+            $file->write($from);
+            $file->rewind();
+
+            return $file;
         }
 
         if (is_resource($from)) {
@@ -80,15 +81,6 @@ final class File implements FileInterface
         }
 
         throw new InvalidArgumentException(sprintf('Cannot create %s from %s.', self::class, get_debug_type($from)));
-    }
-
-    public static function fromString(string $content): self
-    {
-        $file = self::temp();
-        $file->write($content);
-        $file->rewind();
-
-        return $file;
     }
 
     public function getPath(): string
