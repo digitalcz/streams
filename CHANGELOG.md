@@ -7,6 +7,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ## [Unreleased]
 ### Added
 - `File::fromString()` that always treats the string as content, never as a path
+- `LimitStream`, a read-only view of a window (offset + limit) of another stream
+- `AppendStream`, a read-only stream that reads several streams one after another
 - `StreamInfo::hash()` that hashes any PSR-7 stream in chunks without loading it into memory
 - `StreamInfo::mimeType()` that detects the MIME type of any PSR-7 stream from its first chunk (requires `ext-fileinfo`)
 
@@ -18,6 +20,8 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - `Stream::copy()` no longer throws when the source is non-seekable and already at EOF
 - `BufferedStream::seek()` past the buffered data after a rewind lands on the requested position
 - `BufferedStream::seek()` with `SEEK_END` reads the source to the end when its size is unknown
+- `StreamWrapper` no longer detaches a wrapped decorator (`File`, `TempFile`, `BufferedStream`) when the resource is cast, e.g. by `stream_select()`; casting is only supported for a wrapped `Stream`
+- `StreamWrapper` reports failed seek, tell, read and write to `fseek()`, `fread()` and `fwrite()` instead of throwing
 
 ## [1.2.0] - 2026-10-15
 ### Changed
