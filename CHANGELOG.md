@@ -4,13 +4,16 @@ All notable changes will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [Unreleased]
+## [1.3.0] - 2026-10-20
 ### Added
 - `File::fromString()` that always treats the string as content, never as a path
 - `LimitStream`, a read-only view of a window (offset + limit) of another stream
 - `AppendStream`, a read-only stream that reads several streams one after another
 - `StreamInfo::hash()` that hashes any PSR-7 stream in chunks without loading it into memory
 - `StreamInfo::mimeType()` that detects the MIME type of any PSR-7 stream from its first chunk (requires `ext-fileinfo`)
+
+### Changed
+- Allow `digitalcz/coding-standard` 0.7 in development dependencies
 
 ### Deprecated
 - Passing a string to `File::from()`: an existing path opens that file instead of using the string as content, which is unsafe with untrusted input. Use `File::fromString()` or `new File($path)`
